@@ -28,7 +28,10 @@ There are several ways to start or stop the server:
 
 ## Requirements
 
-*   PHP installed on your system and added to your PATH.
+> **Note:** This extension requires PHP to be installed on your system. It will try to find it automatically, but if it fails, you may need to set the path to your PHP executable in the extension settings.
+
+*   PHP installed on your system.
+*   The extension will attempt to automatically find your PHP installation. If it cannot, you will need to set the `php-live-server.phpPath` setting.
 
 ## Extension Settings
 
