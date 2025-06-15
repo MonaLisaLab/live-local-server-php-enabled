@@ -37,6 +37,7 @@ This extension contributes the following settings:
 *   `php-live-server.port`: Port number for the PHP server (default: `3000`).
 *   `php-live-server.host`: Hostname for the PHP server (default: `localhost`).
 *   `php-live-server.root`: Root directory for the PHP server (default: workspace root).
+*   `php-live-server.phpPath`: Custom path to the PHP executable (e.g., `/usr/bin/php` or `C:\\php\\php.exe`). Defaults to `php`, which requires PHP to be in your system's PATH.
 
 ## Known Issues
 

@@ -3,7 +3,11 @@
   "displayName": "PHP Live Server",
   "description": "A VSCode extension to serve PHP projects locally.",
   "version": "0.0.1",
-  "publisher": "your-publisher-name",
+  "publisher": "gemini-labs",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/example/vscode-php-live-server.git"
+  },
   "engines": {
     "vscode": "^1.80.0"
   },
@@ -37,15 +41,44 @@
         }
       ]
     },
+    "configuration": {
+      "title": "PHP Live Server",
+      "properties": {
+        "php-live-server.port": {
+          "type": "number",
+          "default": 3000,
+          "description": "Port number for the PHP server."
+        },
+        "php-live-server.host": {
+          "type": "string",
+          "default": "localhost",
+          "description": "Hostname for the PHP server."
+        },
+        "php-live-server.root": {
+          "type": "string",
+          "default": null,
+          "description": "Root directory for the PHP server. Defaults to the workspace root."
+        },
+        "php-live-server.phpPath": {
+          "type": "string",
+          "default": "php",
+          "description": "Custom path to the PHP executable."
+        }
+      }
+    }
+  },
   "dependencies": {
+    "@types/ws": "^8.18.1",
+    "chokidar": "^3.5.3",
     "php-server": "^0.2.1",
-    "chokidar": "^3.5.3"
+    "ws": "^8.18.2"
   },
   "devDependencies": {
-    "@types/vscode": "^1.80.0",
     "@types/node": "^20.0.0",
-    "typescript": "^5.0.0",
+    "@types/vscode": "^1.80.0",
     "ts-loader": "^9.0.0",
+    "typescript": "^5.0.0",
+    "vsce": "^2.15.0",
     "webpack": "^5.0.0",
     "webpack-cli": "^5.0.0"
   },

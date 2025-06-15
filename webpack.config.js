@@ -11,6 +11,7 @@ module.exports = {
   target: 'node',
   externals: {
     vscode: 'commonjs vscode', // The vscode-module is created on-the-fly and must be excluded.
+    'fsevents': 'commonjs fsevents' // Exclude fsevents from the bundle
   },
   resolve: {
     extensions: ['.ts', '.js'],

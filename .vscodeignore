@@ -1,6 +1,5 @@
 node_modules
 src
-out
 webpack.config.js
 tsconfig.json
 .vscode-test/

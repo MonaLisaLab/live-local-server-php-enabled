@@ -1,9 +1,10 @@
 import * as vscode from 'vscode';
-import { phpServer } from 'php-server';
+import phpServer from 'php-server';
 import * as path from 'path';
 import * as chokidar from 'chokidar';
 import * as ws from 'ws';
 import { exec } from 'child_process';
+import * as fs from 'fs';
 
 // Module-level variables
 let outputChannel: vscode.OutputChannel;
@@ -14,7 +15,7 @@ let webSocketServer: ws.Server | null = null;
 let webSocketPort: number = 0;
 const connectedSockets: Set<ws.WebSocket> = new Set();
 let currentWorkspacePath: string | null = null;
-let phpPathVerified = false; // Flag to check PHP path only once
+let effectivePhpPath: string | null = null; // This will hold the path to the PHP executable we will use.
 
 // Logging function
 function log(message: string, type: 'info' | 'warn' | 'error' = 'info') {
@@ -44,29 +45,107 @@ function log(message: string, type: 'info' | 'warn' | 'error' = 'info') {
     }
 }
 
+// --- PHP Path Discovery Functions ---
 
-// Function to verify PHP path
-async function verifyPHPPath(): Promise<boolean> {
-    if (phpPathVerified) return true;
-
+async function testPhpPath(phpPath: string): Promise<{ success: boolean; version: string }> {
     return new Promise((resolve) => {
-        exec('php -v', (error, stdout, stderr) => {
+        // Use quotes around the path to handle spaces
+        exec(`"${phpPath}" -v`, (error, stdout, stderr) => {
             if (error) {
-                log('PHP executable not found or `php -v` failed. Please ensure PHP is installed and in your system PATH.', 'error');
-                log(`'php -v' error: ${stderr || error.message}`, 'error');
-                vscode.window.showErrorMessage('PHP not found. Please install PHP and add it to your PATH. Check the "PHP Live Server" output for details.');
-                phpPathVerified = false; // Explicitly set, though it's the default
-                resolve(false);
+                log(`Path validation failed for "${phpPath}": ${stderr || error.message}`, 'info');
+                resolve({ success: false, version: '' });
             } else {
-                log('PHP path verified successfully.', 'info');
-                log(`PHP version: ${stdout.split('\n')[0]}`, 'info'); // Log first line of php -v
-                phpPathVerified = true;
-                resolve(true);
+                const version = stdout.split('\n')[0];
+                log(`Path validation successful for "${phpPath}". Version: ${version}`, 'info');
+                resolve({ success: true, version });
             }
         });
     });
 }
 
+async function findPhpExecutable(): Promise<string | null> {
+    const config = vscode.workspace.getConfiguration('php-live-server');
+    const configuredPath = config.get<string>('phpPath') || 'php';
+
+    // 1. Try the configured path first
+    const testResult = await testPhpPath(configuredPath);
+    if (testResult.success) {
+        log(`Using configured PHP path: ${configuredPath}`, 'info');
+        return configuredPath;
+    }
+    
+    // If 'php' failed, it's not in PATH. Let's search.
+    log(`'${configuredPath}' is not a valid command. Searching for PHP executable in common locations...`, 'info');
+
+    // 2. Search common paths
+    const platform = process.platform;
+    let searchPaths: string[] = [];
+    if (platform === 'win32') {
+        const progFiles = process.env['ProgramFiles'] || 'C:\\Program Files';
+        const progFilesX86 = process.env['ProgramFiles(x86)'] || 'C:\\Program Files (x86)';
+        searchPaths = [
+            'C:\\php\\php.exe',
+            'C:\\xampp\\php\\php.exe',
+            'C:\\wamp\\bin\\php\\php.exe',
+            'C:\\wamp64\\bin\\php\\php.exe',
+            `${progFiles}\\php\\php.exe`,
+            `${progFilesX86}\\php\\php.exe`,
+        ];
+    } else { // darwin, linux
+        searchPaths = [
+            '/usr/local/bin/php', // Common for Homebrew on Intel
+            '/opt/homebrew/bin/php', // Common for Homebrew on Apple Silicon
+            '/usr/bin/php', // Default on many Linux distros
+            '/bin/php',
+            // MAMP on macOS (common versions, adjust as needed)
+            '/Applications/MAMP/bin/php/php8.2.0/bin/php',
+            '/Applications/MAMP/bin/php/php8.1.13/bin/php',
+            '/Applications/MAMP/bin/php/php7.4.33/bin/php',
+        ];
+    }
+
+    for (const p of searchPaths) {
+        try {
+            await fs.promises.access(p, fs.constants.F_OK); // Check for existence
+            const test = await testPhpPath(p);
+            if (test.success) {
+                log(`Found PHP executable at: ${p}`, 'info');
+
+                const saveChoice = await vscode.window.showInformationMessage(
+                    `PHP Live Server found PHP at "${p}". Do you want to save this path to your settings?`,
+                    'Save to Workspace Settings',
+                    'Save to User Settings',
+                    'No, Thanks'
+                );
+
+                if (saveChoice === 'Save to Workspace Settings') {
+                    await config.update('phpPath', p, vscode.ConfigurationTarget.Workspace);
+                    log(`Saved PHP path to workspace settings.`, 'info');
+                } else if (saveChoice === 'Save to User Settings') {
+                    await config.update('phpPath', p, vscode.ConfigurationTarget.Global);
+                    log(`Saved PHP path to user settings.`, 'info');
+                }
+                
+                return p;
+            }
+        } catch {
+            // Path doesn't exist, continue.
+        }
+    }
+
+    return null;
+}
+
+async function initializePhpPath(): Promise<boolean> {
+    effectivePhpPath = await findPhpExecutable();
+    if (effectivePhpPath) {
+        return true;
+    } else {
+        log('PHP executable could not be found automatically. Please install PHP or set the "php-live-server.phpPath" setting manually.', 'error');
+        vscode.window.showErrorMessage('PHP not found. Please set the `php-live-server.phpPath` setting to the absolute path of your PHP executable.');
+        return false;
+    }
+}
 
 // Function to start the WebSocket server
 function startWebSocketServer(callback: (assignedPort: number) => void) {
@@ -88,7 +167,7 @@ function startWebSocketServer(callback: (assignedPort: number) => void) {
     callback(webSocketPort);
   });
 
-  wss.on('connection', (socket) => {
+  wss.on('connection', (socket: ws.WebSocket) => {
     log('WebSocket client connected.', 'info');
     connectedSockets.add(socket);
 
@@ -97,7 +176,7 @@ function startWebSocketServer(callback: (assignedPort: number) => void) {
       connectedSockets.delete(socket);
     });
 
-    socket.on('error', (error) => {
+    socket.on('error', (error: Error) => {
       log(`WebSocket error on client socket: ${error.message}`, 'error');
       // This is usually a client-side issue, so only log it.
     });
@@ -186,7 +265,7 @@ async function stopAuxiliaryServices() {
 
     await new Promise<void>((resolve, reject) => {
         if (webSocketServer) {
-            webSocketServer.close((err) => {
+            webSocketServer.close((err?: Error) => {
                 if (err) {
                     log(`Error closing WebSocket server: ${err.message}`, 'error');
                     reject(err);
@@ -222,8 +301,8 @@ export function activate(context: vscode.ExtensionContext) {
     } else {
       log('Attempting to start PHP server...', 'info');
 
-      if (!await verifyPHPPath()) {
-        // verifyPHPPath already shows an error message and logs
+      if (!await initializePhpPath()) {
+        // initializePhpPath already shows an error message and logs
         return;
       }
 
@@ -260,6 +339,7 @@ export function activate(context: vscode.ExtensionContext) {
             base: workspaceRootPath,
             open: false, // We will open manually
             router: routerScriptPath,
+            binary: effectivePhpPath!, // Use the discovered PHP path
             env: {
               ...process.env, // Inherit existing env variables
               PHP_LIVE_SERVER_WS_PORT: webSocketPort.toString()
