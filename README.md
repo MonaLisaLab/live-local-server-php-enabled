@@ -6,7 +6,25 @@ Serve your PHP projects with a live server directly from VSCode.
 
 *   Start and stop a PHP server.
 *   View your PHP project live in the browser.
+*   Hot reload the browser when you change `php`, `html`, `css`, or `js` files.
 *   (More features to come)
+
+## Usage
+
+There are several ways to start or stop the server:
+
+1.  **From the Status Bar:**
+    *   Click the `$(play) Start PHP Server` button in the status bar at the bottom-right of your VSCode window.
+    *   When the server is running, the button will change to `$(debug-stop) Stop PHP Server`. Click it again to stop the server.
+
+2.  **From the Command Palette:**
+    *   Open the Command Palette (`Cmd+Shift+P` on macOS, `Ctrl+Shift+P` on Windows/Linux).
+    *   Type `Start/Stop PHP Live Server` and press `Enter`.
+
+3.  **From the Context Menu:**
+    *   Right-click on a `.php` file in the Explorer view.
+    *   Or, right-click inside a `.php` editor.
+    *   Select `Start/Stop PHP Live Server` from the context menu.
 
 ## Requirements
 
