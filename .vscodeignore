@@ -1,5 +1,6 @@
 node_modules
 src
+!src/images
 webpack.config.js
 tsconfig.json
 .vscode-test/

@@ -2,11 +2,16 @@
   "name": "php-enabled-live-local-server",
   "displayName": "PHP-enabled Live Local Server",
   "description": "A VSCode extension to serve PHP projects locally with a live server.",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "publisher": "t-myk",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/MonaLisaLab/live-local-server-php-enabled.git"
+  },
   "engines": {
     "vscode": "^1.80.0"
   },
+  "icon": "src/images/logo.png",
   "categories": [
     "Other"
   ],
