@@ -14,8 +14,8 @@ Serve your PHP projects with a live server directly from VSCode.
 There are several ways to start or stop the server:
 
 1.  **From the Status Bar:**
-    *   Click the `$(play) Start PHP Server` button in the status bar at the bottom-right of your VSCode window.
-    *   When the server is running, the button will change to `$(debug-stop) Stop PHP Server`. Click it again to stop the server.
+    *   Click the `▶︎ Start PHP Server` button in the status bar at the bottom-right of your VSCode window.
+    *   When the server is running, the button will change to `⏹ Stop PHP Server`. Click it again to stop the server.
 
 2.  **From the Command Palette:**
     *   Open the Command Palette (`Cmd+Shift+P` on macOS, `Ctrl+Shift+P` on Windows/Linux).
@@ -42,9 +42,6 @@ This extension contributes the following settings:
 *   `php-live-server.root`: Root directory for the PHP server (default: workspace root).
 *   `php-live-server.phpPath`: Custom path to the PHP executable (e.g., `/usr/bin/php` or `C:\\php\\php.exe`). Defaults to `php`, which requires PHP to be in your system's PATH.
 
-## Known Issues
-
-No known issues at the moment. Please report any issues on the GitHub repository.
 
 ## Release Notes
 

@@ -8,7 +8,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) a
 
 - Initial basic structure for the VSCode extension.
 
-## [0.0.1] - YYYY-MM-DD
+## [0.0.1] - 2025-06-18
 
 ### Added
 
