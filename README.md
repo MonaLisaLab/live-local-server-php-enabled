@@ -2,6 +2,8 @@
 
 Serve your PHP projects with a live server directly from VSCode.
 
+![Usage Demo](src/images/explain.gif)
+
 ## Features
 
 *   Start and stop a PHP server.
