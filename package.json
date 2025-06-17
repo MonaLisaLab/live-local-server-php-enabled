@@ -1,13 +1,9 @@
 {
-  "name": "php-live-server",
-  "displayName": "PHP Live Server",
-  "description": "A VSCode extension to serve PHP projects locally.",
+  "name": "php-enabled-live-local-server",
+  "displayName": "PHP-enabled Live Local Server",
+  "description": "A VSCode extension to serve PHP projects locally with a live server.",
   "version": "0.0.1",
-  "publisher": "gemini-labs",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/example/vscode-php-live-server.git"
-  },
+  "publisher": "t-myk",
   "engines": {
     "vscode": "^1.80.0"
   },
@@ -42,7 +38,7 @@
       ]
     },
     "configuration": {
-      "title": "PHP Live Server",
+      "title": "PHP-enabled Live Local Server",
       "properties": {
         "php-live-server.port": {
           "type": "number",

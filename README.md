@@ -1,4 +1,4 @@
-# PHP Live Server VSCode Extension
+# PHP-enabled Live Local Server VSCode Extension
 
 Serve your PHP projects with a live server directly from VSCode.
 
@@ -47,7 +47,7 @@ This extension contributes the following settings:
 
 ### 0.0.1
 
-Initial release of the PHP Live Server extension.
+Initial release of the PHP-enabled Live Local Server extension.
 ---
 
 **Enjoy!**
