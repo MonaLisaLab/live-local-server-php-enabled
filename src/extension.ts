@@ -141,8 +141,8 @@ async function initializePhpPath(): Promise<boolean> {
     if (effectivePhpPath) {
         return true;
     } else {
-        log('PHP executable could not be found automatically. Please install PHP or set the "php-live-server.phpPath" setting manually.', 'error');
-        vscode.window.showErrorMessage('PHP not found. Please set the `php-live-server.phpPath` setting to the absolute path of your PHP executable.');
+        log('PHP executable could not be found automatically. Please install PHP and add it to your PATH, or set the "php-live-server.phpPath" setting manually.', 'error');
+        vscode.window.showErrorMessage('PHP executable not found. Please install PHP and add it to your system PATH, or set the extension setting `php-live-server.phpPath`.');
         return false;
     }
 }
