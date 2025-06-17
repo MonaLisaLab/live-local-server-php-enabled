@@ -16,7 +16,7 @@ $publicDir = $_SERVER['DOCUMENT_ROOT']; // Base path from php-server
 if (strpos(realpath($requestedFile), realpath($publicDir)) !== 0) {
     // Or handle as a 404, or log an error.
     // This is a basic security check.
-    error_log("Attempt to access file outside of public directory: " . $requestedFile);
+    error_log("Attempted access to file outside of public directory: " . $requestedFile);
     http_response_code(404);
     echo "File not found.";
     return true;
